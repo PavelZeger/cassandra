@@ -1,0 +1,23 @@
+Cassandra Restore Methods
+Backups are meaningful when they are restorable under situations when keyspace gets deleted or new cluster gets launched from the backup data or a node get replaced. Restoring backed up data is possible from snapshots and if you are using incremental backups then you need all incremental backup files created after the snapshot. There are mainly two ways to restore data from backup. One is using nodetool refresh and another one using sstableloader.
+
+Restore using nodetool refresh:
+Nodetool refresh command loads newly placed SSTables onto the system without a restart. This method is used when new node replace a node which is not recoverable. Restore data from a snapshot is possible if the table schema exists. Assuming you have created a new node then follow the below steps
+
+Create the schema if not created already.
+Truncate the table,if necessary.
+Locate the snapshot folder(/var/lib/keyspace_name/table_name UUID/snapshots/snapshot_name) and copy the snapshot SSTable directory to the /var/lib/keyspace/table_name-UUID directory.
+Run nodetool refresh.
+Restore using sstableloader:
+The sstableloader loads a set of SSTable files in a Cassandra cluster. The sstableloader provides the following options.
+
+Loading external data
+Loading existing SSTables
+Restore snapshots
+The sstableloader does not simply copy the SSTables to every node, but also transfers the relevant part of the data to each node and also maintain the replication factor. Here sstableloader used for restore snapshots. Follow the below steps for restore using sstableloader
+
+Create the schema if not exists.
+Truncate the table if necessary.
+Bring your back up data to a node from AWS S3 or Google Cloud or MS AzureExample: Download your backup data in /home/data
+Run the below command
+sstableloader -d ip /home/data
